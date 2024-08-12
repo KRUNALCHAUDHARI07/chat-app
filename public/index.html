@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div>
+        <h1>Chat Application</h1>
+        <input type="text" id="userId" placeholder="Enter your User ID">
+        <button onclick="joinChannel()">Join Channel</button>
+    </div>
+    <div id="chat" style="display:none;">
+        <h2>Channel: <span id="channelName"></span></h2>
+        <div id="messages"></div>
+        <input type="text" id="message" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send Message</button>
+    </div>
+
+    <script>
+        const socket = io();
+        let userId = '';
+        let messagesList = [];
+
+        socket.on('loadMessage',()=> {
+            
+        })
+        // socket.on('receiveMessage', ({ userId, message }) => {
+            socket.on('receiveMessage',({userId, message})=> {
+            
+            messagesList.push({userId, message})
+            const messageDiv = document.getElementById('messages');
+            messageDiv.innerHTML='';
+            messagesList.forEach(message => {
+                const div = document.createElement('div');
+                div.textContent = `${message.userId}: ${message.message}`;
+                messageDiv.appendChild(div);
+            });
+        })
+        function joinChannel() {
+            userId = document.getElementById('userId').value;
+            document.getElementById('channelName').textContent = userId;
+            document.getElementById('chat').style.display = 'block';
+            socket.emit('joinChannel',{userId,messagesList});
+            document.getElementById('userId').value = '';
+            const messageDiv = document.getElementById('messages');
+            messageDiv.innerHTML='';
+
+            messagesList.forEach(message => {
+                const div = div = document.createElement('div');
+                div.textContent = `${message.userId}: ${message.message}`;
+                messageDiv.appendChild(div);
+            });
+        }
+
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+
+            socket.emit('sendMessage',{userId,message});
+            message.value = '';
+        }
+
+       
+    </script>
+</body>
+</html>
